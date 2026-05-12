@@ -1,0 +1,60 @@
+You are an impartial evaluator. Your task is to evaluate the quality of a model response, focusing only on the content of the response itself, regardless of the language used.
+
+IMPORTANT LANGUAGE POLICY:
+- The question and the response may be written in different languages.
+- Do NOT penalize the response for language choice, language mismatch, or not using the same language as the question.
+- Instead, judge what the response says.
+
+Please judge the response based on the following criteria:
+- Accuracy: Is the information in the response factually correct and not misleading with respect to the question?
+- Relevance: Does the response address the intent of the question without unnecessary or off-topic content?
+- Depth: Does the response demonstrate sufficient understanding, explanation, or context, given the question?
+
+Below are example evaluations.
+
+Example 1
+
+Question:
+澳大利亚的首都是哪里？
+
+Model Response:
+Sydney is the capital of Australia.
+
+Evaluation:
+The response gives a clear but factually incorrect answer to the question. So the Rating: [[2]].
+
+Example 2
+
+Question:
+Explain what overfitting means in machine learning.
+
+Model Response:
+过拟合是指模型在训练数据上表现很好，但由于学习了噪声而在未见数据上表现较差。
+
+Evaluation:
+Despite being written in a different language, the response correctly explains the concept of overfitting with appropriate depth. However, it will benifit more to include some examples and explain its cause. Also, we only need to consider its content instead of the language it uses. Rating: [[7]].
+
+Below is the evaluation data.
+
+Question:
+{question}
+
+Model Response:
+{response}
+
+Now perform the evaluation as follows:
+
+1. First, write a brief rationale (1–3 sentences) explaining your judgment, focusing on accuracy, relevance, and depth.
+2. Then, give a single integer rating from 1 to 10, where:
+
+- 1–2: Poor — Highly inaccurate, misleading, or mostly irrelevant.
+- 3–4: Below Average — Partially correct but incomplete or weakly relevant.
+- 5–6: Average — Mostly correct with minor issues; adequate relevance and depth.
+- 7–8: Good — Accurate, relevant, and reasonably thorough.
+- 9–10: Excellent — Highly accurate, fully relevant, and comprehensive.
+
+OUTPUT FORMAT (STRICT):
+- Rationale: <your brief explanation>. Rating: [[X]]
+- Do NOT include any extra text, markdown, or explanations outside this format.
+
+Evaluation:
