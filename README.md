@@ -2,7 +2,9 @@
 
 This is the official implementation for the paper: "Learning to Route Languages for Multilingual Preference Optimization".
 
-LRPO is an online preference optimization method for multilingual LLMs. Instead of assuming that every training question should be answered in its input language or in a fixed dominant language such as English, LRPO treats the rollout language as a selectable training variable. For each question, it samples multilingual rollout groups, scores them with calibrated cross-lingual rewards, and updates both the policy model and a trainable language router.
+LRPO is an online preference optimization method for multilingual LLMs, which treats the rollout language as a selectable training variable. For each question, it samples multilingual rollout groups, scores them with calibrated cross-lingual rewards, and updates both the policy model and a trainable language router.
+
+LRPO builds on [`verl`](https://github.com/volcengine/verl), so most distributed training, rollout, checkpointing, and logging behavior follows the upstream `verl` interface.
 
 ## Method Summary
 
@@ -11,8 +13,6 @@ LRPO has three main pieces:
 - **Language-routed rollouts:** for each training question, LRPO generates a group of responses in multiple target languages under a fixed rollout budget.
 - **Calibrated multilingual rewards:** generated responses are compared with high-quality references using cross-lingual semantic similarity, then calibrated so scores are more comparable across language pairs.
 - **Trainable language router:** a contextual multi-armed bandit learns topic- and region-conditioned language preferences and balances exploration with exploitation during training.
-
-LRPO builds on [`verl`](https://github.com/volcengine/verl), so most distributed training, rollout, checkpointing, and logging behavior follows the upstream `verl` interface.
 
 
 ## Installation
@@ -38,36 +38,21 @@ pip install ".[sglang]"
 Reward code may require additional assets, depending on the reward function you use:
 
 - a language identification model;
-- mmBERT or another multilingual semantic similarity model;
+- mmBERT or other multilingual embedding models or multilingual reward models;
 - offline calibration statistics for cross-lingual reward normalization.
 
-Check the paths inside `verl/utils/reward_score/*.py` before running experiments, since some current scripts still contain local research paths.
 
 ## Data
 
-The paper trains on the training splits of two multilingual human-preference datasets:
-
-- **HelpSteer3**
-- **CARE**
-
-Together they contain **4,885 samples across 14 languages**. The paper assigns each sample a topic label from six categories:
-
-- Regional Knowledge
-- General Knowledge
-- Chat / Conversational
-- Reasoning / Logic
-- Safety / Ethics
-- Translation
-
-Regional queries also receive region labels. These topic and region labels are used by the language router.
-
-LRPO uses the `verl` parquet format. Each row should provide the fields needed for prompting, reward computation, and routing, including:
+LRPO uses the `verl` parquet format. Each row should provide the fields needed for prompting, reward computation, and language routing:
 
 - `prompt`
 - `reward_model.ground_truth`
-- `ability` or an equivalent topic field
-- `extra_info.language`
-- `extra_info.region` when applicable
+- `ability`: topic/category label used by the language router
+- `extra_info.language`: source or reference language for the example
+- `extra_info.region`: region label for regional examples, if applicable
+
+Preprocessing examples are available in `examples/data_preprocess/`. Treat them as templates and adapt them to your own dataset paths and schema.
 
 
 ## Training
@@ -122,20 +107,12 @@ See `examples/grpo_trainer/run_erm.sh` for a concrete launch script. Replace the
 | `+data.lang_policy_group_norm` | Reward normalization for router updates, for example `center` or `zscore`. |
 | `+data.lang_policy_log_path` | Optional JSONL path for router probability logs. |
 
-## Reward Calibration
-
-The paper studies two calibration variants for cross-lingual semantic rewards:
-
-- **Mean-based calibration:** adjusts scores using language-pair mean similarity statistics from semantically equivalent pairs.
-- **Quantile-based calibration:** maps raw similarity scores through language-pair empirical quantile tables.
-
-Both are designed to reduce language-pair bias in raw embedding similarity scores. The final reward is gated by language consistency: if the response is not in the routed language, its reward is set to zero.
-
 
 ## Public Release Checklist
 
 Before public reproduction, the repository still needs:
 
+- add two calibration ways;
 - released reward calibration files;
 - removal or parameterization of private absolute paths.
 
@@ -149,4 +126,3 @@ Before public reproduction, the repository still needs:
   note = {ICML}
 }
 ```
-

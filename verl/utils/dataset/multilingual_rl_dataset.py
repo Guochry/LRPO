@@ -124,52 +124,9 @@ class MultilangRepeatDataset(Dataset):
         self.serialize_dataset = False
         self.return_multi_modal_inputs = config.get("return_multi_modal_inputs", True)
         
-        # self.lang_mix = {"Reasoning": "ar:1,ja:1,zh:2,en:4", "Safety": "ar:2,ja:2,zh:2,en:2", "Chat": "ar:2,ja:2,zh:2,en:2", "Chat Hard": "ar:2,ja:2,zh:2,en:2"}
-        # self.lang_seq = {key: self._parse_lang_mix(self.lang_mix[key]) for key in self.lang_mix}
-        # self.n = len(list(self.lang_seq.values())[0])
-
-        # self.topic_lang_mix = {
-        #     "General Knowledge": "en:4,zh:2,es:2",
-        #     "Regional Knowledge": "en:4,zh:1,ar:1,es:1,ru:1",
-        #     "Reasoning": "en:6,zh:2",
-        #     "Safety": "en:4,zh:2,ar:1,ja:1",
-        #     "Chat": "en:4,zh:2,es:1,ar:1",
-        # }
-        # self.region_lang_mix = {
-        #     "China": "zh:6,en:2",
-        #     "Japan": "ja:3,zh:3,en:2",
-        #     "South Korea": "ko:6,en:2",
-        #     "North Korea": "ko:4,en:4",
-
-        #     "Russia": "ru:6,en:2",
-        #     "Vietnam": "vi:4,en:4",
-        #     "Spain": "es:6,en:2",
-        #     "Poland": "pl:6,en:2",
-        #     "Germany": "de:6,en:2",
-        #     "France": "fr:6,en:2",
-        #     "Italy": "it:6,en:2",
-
-        #     "Arab World": "ar:6,en:2",
-        #     "Latin America": "es:4,pt:2,en:2",
-        #     "Africa": "en:6,fr:2",
-
-        #     "Europe": "en:2,de:2,fr:2,es:2",
-        #     "Polynesia": "en:6,fr:2",
-
-        #     "Central Asia": "en:8",
-        #     "Southeast Asia": "id:2,en:2,vi:2,th:1,zh:1",
-        #     "South Asia": "en:6,ar:1,zh:1",
-
-        #     "Iran": "en:5,ar:2,ru:1",
-        #     "Israel": "en:5,ar:2,ru:1",
-        #     "Turkey": "en:3,ar:2,ru:2,de:1",
-
-        #     "Anglosphere": "en:7,fr:1",
-        # }
         langs_sorted = sorted(set(language_to_code.values()))
         uniform_mix = ",".join([f"{lang}:1" for lang in langs_sorted])
-        # uniform_mix = "en:1"
-        # print("ooooooo", uniform_mix, "ooooooo")
+
         self.topic_lang_mix = {
             "General Knowledge": uniform_mix,
             "Regional Knowledge": uniform_mix,
@@ -250,13 +207,7 @@ class MultilangRepeatDataset(Dataset):
             image_key = self.image_key
             video_key = self.video_key
             
-            # langs_unique = list(dict.fromkeys(self.lang_seq))
             all_langs = set()
-            # for v in self.topic_lang_seq.values():
-            #     all_langs.update(v)
-            # for v in self.region_lang_seq.values():
-            #     all_langs.update(v)
-            # langs_unique = list(all_langs)
             all_langs.update(language_to_code.values())
             langs_unique = list(all_langs)
             

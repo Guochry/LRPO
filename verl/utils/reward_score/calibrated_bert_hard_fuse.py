@@ -9,8 +9,7 @@ from functools import lru_cache
 import fasttext
 import numpy as np
 
-# ===================== fastText LID (unchanged) =====================
-LID_MODEL_PATH = '/coc/pskynet5/gguo37/rl/fixed_mrpo/examples/grpo_trainer/lid.176.ftz'
+LID_MODEL_PATH = '/path/to/lid.176.ftz'
 LID_DEVICE = "cpu"
 ALLOWED_LANGS = {"ar","de","en","es","fr","id","it","ja","ko","nl","pl","pt","ru","vi","zh"}
 
@@ -67,10 +66,6 @@ def predict_lang_fasttext(texts):
     return out
 
 def lang_match_reward(pred_lang, pred_prob, target_lang, soft=True):
-    """
-    soft=True: 匹配按置信度给分；不匹配给 0
-    soft=False: 匹配=1，不匹配=0
-    """
     if target_lang is None:
         return 0.0
     if pred_lang is None:
@@ -80,16 +75,12 @@ def lang_match_reward(pred_lang, pred_prob, target_lang, soft=True):
     return float(pred_prob) if soft else 1.0
 
 
-# ===================== Calibration stats (NEW) =====================
-# Your stats file (unordered pairs)
-STATS_CSV = "/coc/pskynet5/gguo37/rl/reward_calibration/sim_compute/data/unordered_pair_mean_std.csv"
+STATS_CSV = "/path/to/unordered_pair_mean_std.csv"
 
-# Anchor-to-reference calibration config (match your tested setting)
 ALPHA_FIXED = None   # keep None to use adaptive alpha
 K_SHRINK = 0
 CALIB_CLIP_SIM = True  # clamp calibrated cosine to [-1,1] before mapping to reward
 
-# Map fastText code -> CSV language name (must match csv exactly)
 CODE_TO_NAME = {
     "zh": "Chinese",
     "ar": "Arabic",
@@ -172,7 +163,7 @@ def calibrate_anchor_to_ref_cosine(raw_sim: float, gt_lang_code: str | None, res
     return cal
 
 
-# ===================== mmBERT embedding reward (UPDATED) =====================
+# ===================== mmBERT embedding reward =====================
 MMBERT_NAME = "jhu-clsp/mmBERT-small"
 MMBERT_DEVICE = os.getenv("MMBERT_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 MMBERT_MAX_LEN = int(os.getenv("MMBERT_MAX_LEN", "512"))
@@ -266,7 +257,7 @@ def compute_score_batch(data_sources, solution_strs, ground_truths, extra_infos)
 
         raw_sim = mmbert_cosine_sim(a_list, b_list).detach().cpu().numpy().tolist()  # list[float]
 
-        # calibrate each example in this chunk
+        # calibrate each example
         for k, s_raw in enumerate(raw_sim):
             global_idx = i + k
             gt_lang = gt_langs[global_idx]
@@ -277,14 +268,14 @@ def compute_score_batch(data_sources, solution_strs, ground_truths, extra_infos)
 
             embed_rewards.append(r_cal)
 
-    # ----------- Language rewards (unchanged) -----------
+    # ----------- Language rewards -----------
     lang_rewards = []
     for (pred_lang, prob), tgt in zip(preds, target_langs):
         lang_rewards.append(lang_match_reward(pred_lang, prob, tgt, soft=False))
 
     print(target_langs[:10], '======', preds[:10], '======', lang_rewards[:10], '======', solution_strs[:10], '======', ground_truths[:10])
 
-    # ----------- Fuse (keep your hard gate) -----------
+    # ----------- Fuse -----------
     rewards = []
     consistency_scores = []
     for r_emb, r_lang in zip(embed_rewards, lang_rewards):

@@ -1226,8 +1226,7 @@ class RayPPOTrainer:
                 critic_path, del_local_after_load=self.config.trainer.del_local_ckpt_after_load
             )
 
-        # load dataloader,
-        # TODO: from remote not implemented yet
+        # load dataloader
         dataloader_local_path = os.path.join(global_step_folder, "data.pt")
         if os.path.exists(dataloader_local_path):
             dataloader_state_dict = torch.load(dataloader_local_path, weights_only=False)
@@ -1332,9 +1331,6 @@ class RayPPOTrainer:
                 self._external_train_batch_sampler.set_epoch(epoch)
 
             for batch_dict in self.train_dataloader:
-                # print("HEYYYYYYY")
-                # tem_uid=batch_dict['uid'].tolist()
-                # print(sorted(collections.Counter(tem_uid).values())[:10])
                 metrics = {}
                 timing_raw = {}
 
@@ -1347,24 +1343,11 @@ class RayPPOTrainer:
 
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
 
-                # if os.environ.get("RANK", "0") == "0":
-                #     print(batch.non_tensor_batch["uid"])
-                #     print("HHHHHHHHHHHHHHH")
-
-                # add uid to batch
-                # batch.non_tensor_batch["uid"] = np.array(
-                #     [str(uuid.uuid4()) for _ in range(len(batch.batch))], dtype=object
-                # )
-
                 self._maybe_apply_lang_policy(batch, is_train=True)
                 gen_batch = self._get_gen_batch(batch)
-                # print("LOOOOOK")
-                # print(batch)
-                # print("LOOOOOK")
 
                 # pass global_steps to trace
                 gen_batch.meta_info["global_steps"] = self.global_steps                
-                # gen_batch = gen_batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
                 
                 is_last_step = self.global_steps >= self.total_training_steps
 
@@ -1400,16 +1383,11 @@ class RayPPOTrainer:
                             del gen_baseline_batch, gen_baseline_output
 
                     # repeat to align with repeated responses in rollout
-                    # batch = batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
                     batch = batch.union(gen_batch_output)
 
                     if "response_mask" not in batch.batch.keys():
                         batch.batch["response_mask"] = compute_response_mask(batch)
-                    # Balance the number of valid tokens across DP ranks.
-                    # NOTE: This usually changes the order of data in the `batch`,
-                    # which won't affect the advantage calculation (since it's based on uid),
-                    # but might affect the loss calculation (due to the change of mini-batching).
-                    # TODO: Decouple the DP balancing and mini-batching.
+                    
                     if self.config.trainer.balance_batch:
                         self._balance_batch(batch, metrics=metrics)
 
@@ -1419,16 +1397,12 @@ class RayPPOTrainer:
                     with marked_timer("reward", timing_raw, color="yellow"):
                         # compute reward model score
                         if self.use_rm and "rm_scores" not in batch.batch.keys():
-                            # print('11111111111111111111') not implemented for us
                             reward_tensor = self.rm_wg.compute_rm_score(batch)
                             batch = batch.union(reward_tensor)
 
                         if self.config.reward_model.launch_reward_fn_async:
                             future_reward = compute_reward_async.remote(data=batch, reward_fn=self.reward_fn)
                         else:
-                            #THIS IS OUR IMPLEMENTATION
-                            # print("!!!!!!!!!!!!!!")
-                            # print(batch.non_tensor_batch['lang']) # here it still has 'lang', so it must be within the `compute_reward` or the input `self.reward_fn`
                             reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
                             self._update_lang_policy(batch, reward_tensor)
 
@@ -1445,7 +1419,6 @@ class RayPPOTrainer:
                         batch = batch.union(old_log_prob)
 
                         if "rollout_log_probs" in batch.batch.keys():
-                            # TODO: we may want to add diff of probs too.
                             from verl.utils.debug.metrics import calculate_debug_metrics
 
                             metrics.update(calculate_debug_metrics(batch))
@@ -1469,7 +1442,6 @@ class RayPPOTrainer:
                         # we combine with rule-based rm
                         reward_extra_infos_dict: dict[str, list]
                         if self.config.reward_model.launch_reward_fn_async:
-                            # print('3333333333333333') not implemented for us
                             reward_tensor, reward_extra_infos_dict = ray.get(future_reward)
                             self._update_lang_policy(batch, reward_tensor)
                         batch.batch["token_level_scores"] = reward_tensor
@@ -1505,7 +1477,7 @@ class RayPPOTrainer:
                         try:
                             langs = batch.non_tensor_batch.get("lang", None)
                             if langs is not None:
-                                langs = langs.tolist()  # list[str]，例如: ["ar","ja","zh","zh","zh","en","en","en"]
+                                langs = langs.tolist()
 
                                 if "token_level_rewards" in batch.batch:
                                     sent_rewards = batch.batch["token_level_rewards"].sum(dim=-1).detach().cpu().tolist()
@@ -1523,7 +1495,6 @@ class RayPPOTrainer:
                                 else:
                                     resp_lens = (batch.batch["responses"] != self.tokenizer.pad_token_id).sum(dim=-1).detach().cpu().tolist()
 
-                                # 2) 分语言聚合
                                 from collections import defaultdict
                                 lang2rewards, lang2lens, lang2cnt = defaultdict(float), defaultdict(float), defaultdict(int)
                                 for i, lg in enumerate(langs):
@@ -1532,7 +1503,6 @@ class RayPPOTrainer:
                                     lang2lens[lg] += float(resp_lens[i])
                                     lang2cnt[lg] += 1
 
-                                # 3) 写入 metrics（让 wandb 画多条曲线）
                                 for lg, cnt in lang2cnt.items():
                                     if cnt == 0:
                                         continue
