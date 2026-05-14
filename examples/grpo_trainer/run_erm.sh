@@ -1,15 +1,12 @@
 set -x
 
-export PYTHONPATH=/coc/pskynet6/gguo37/rl/dynamic_mrpo_router_tuning:$PYTHONPATH
+export PYTHONPATH=/path/to/LRPO:$PYTHONPATH
 
-
-# If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
-# export VLLM_ATTENTION_BACKEND=XFORMERS
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files=/coc/pskynet6/gguo37/rl/dynamic_mrpo_router_tuning/examples/data_preprocess/data/care_helpsteer/train.parquet \
-    data.val_files=/coc/pskynet6/gguo37/rl/dynamic_mrpo_router_tuning/examples/data_preprocess/data/care_helpsteer/test.parquet \
+    data.train_files=/path/to/LRPO/data/train.parquet \
+    data.val_files=/path/to/LRPO/data/test.parquet \
     data.train_batch_size=2048 \
     data.max_prompt_length=512 \
     data.max_response_length=1024 \
@@ -35,9 +32,9 @@ python3 -m verl.trainer.main_ppo \
     \
     +data.lang_policy_log_every=1 \
     +data.lang_policy_log_max_keys=100 \
-    +data.lang_policy_log_path=/coc/pskynet6/gguo37/rl/dynamic_mrpo_router_tuning/examples/grpo_trainer/router/qwen3b-warmstart-dynamic_router-quan-alpla0.1-update5-temperature0.3_1_0.999-epsilon_0.2_0_0.995-onpolicy2.jsonl \
+    +data.lang_policy_log_path=/path/to/LRPO/lang_policy_log.jsonl \
     \
-    actor_rollout_ref.model.path=/coc/pskynet6/gguo37/rl/saved/qwen2.5_3b_coldstart/checkpoint-44 \
+    actor_rollout_ref.model.path=/path/to/base-or-warm-start-model \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=256 \
@@ -62,12 +59,12 @@ python3 -m verl.trainer.main_ppo \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     trainer.project_name='verl_grpo' \
-    trainer.experiment_name='qwen3b-warmstart-dynamic_router-quan-alpla0.1-update5-temperature0.3_1_0.999-epsilon_0.2_0_0.995-onpolicy2' \
+    trainer.experiment_name='LRPO' \
     trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
     trainer.save_freq=10 \
     trainer.test_freq=5 \
-    custom_reward_function.path="/coc/pskynet6/gguo37/rl/dynamic_mrpo_router_tuning/verl/utils/reward_score/calibrated_bert_hard_fuse_quan.py" \
+    custom_reward_function.path="/path/to/LRPO/verl/utils/reward_score/calibrated_rs.py" \
     custom_reward_function.name=compute_score_batch \
     reward_model.reward_manager=batch \
     trainer.total_epochs=4 $@

@@ -374,13 +374,7 @@ class RayPPOTrainer:
         """
         Creates the train and validation dataloaders.
         """
-        # TODO: we have to make sure the batch size is divisible by the dp size
         from verl.trainer.main_ppo import create_rl_dataset, create_rl_sampler
-
-        # if os.environ.get("RANK", "0") == "0":   # 只在主进程打印
-        #     print("================ BATCH PREVIEW ================")
-        #     print(train_dataset, train_sampler, collate_fn)
-        #     print("==============================================")
 
         if train_dataset is None:
             train_dataset = create_rl_dataset(
@@ -402,15 +396,6 @@ class RayPPOTrainer:
 
         num_workers = self.config.data["dataloader_num_workers"]
 
-        # self.train_dataloader = StatefulDataLoader(
-        #     dataset=self.train_dataset,
-        #     batch_size=self.config.data.get("gen_batch_size", self.config.data.train_batch_size),
-        #     num_workers=num_workers,
-        #     drop_last=True,
-        #     collate_fn=collate_fn,
-        #     sampler=train_sampler,
-        # )
-
         if self._external_train_batch_sampler is not None:
             self.train_dataloader = StatefulDataLoader(
                 dataset=self.train_dataset,
@@ -430,13 +415,6 @@ class RayPPOTrainer:
                 sampler=train_sampler,
             )
         
-        # self.train_dataloader = StatefulDataLoader(
-        #     dataset=self.train_dataset,
-        #     batch_sampler=self._external_train_batch_sampler,   # 关键：用 batch_sampler
-        #     num_workers=num_workers,
-        #     collate_fn=collate_fn,
-        # )
-
         val_batch_size = self.config.data.val_batch_size  # Prefer config value if set
         if val_batch_size is None:
             val_batch_size = len(self.val_dataset)
@@ -619,9 +597,7 @@ class RayPPOTrainer:
         uid_orig_counts = {}
         for i in range(batch_size):
             fixed_lang = fixed_langs[i] if fixed_langs is not None else None
-            # print(is_train, self.lang_policy_orig_lang_min, self.lang_policy)
             if fixed_lang:
-                # print(11111)
                 lang = fixed_lang
                 lang_idx = (
                     self.lang_policy.get_lang_idx(lang)
@@ -634,7 +610,6 @@ class RayPPOTrainer:
                 and uids is not None
                 and orig_langs is not None
             ):
-                # print(22222)
                 uid = uids[i]
                 count = uid_orig_counts.get(uid, 0)
                 if count < self.lang_policy_orig_lang_min:
@@ -650,12 +625,10 @@ class RayPPOTrainer:
                     region = regions[i] if regions is not None else None
                     lang, lang_idx, _ = self.lang_policy.sample(topic, region)
             elif is_train and self.lang_policy is not None:
-                # print(33333)
                 topic = topics[i] if topics is not None else None
                 region = regions[i] if regions is not None else None
                 lang, lang_idx, _ = self.lang_policy.sample(topic, region)
             else:
-                # print(44444)
                 lang = orig_langs[i] if orig_langs is not None else "en"
                 lang_idx = (
                     self.lang_policy.get_lang_idx(lang)
@@ -861,11 +834,6 @@ class RayPPOTrainer:
                 test_batch.non_tensor_batch["uid"] = np.array(
                     [str(uuid.uuid4()) for _ in range(len(test_batch.batch))], dtype=object
                 )
-
-            # repeat test batch
-            # test_batch = test_batch.repeat(
-            #     repeat_times=self.config.actor_rollout_ref.rollout.val_kwargs.n, interleave=True
-            # )
 
             # we only do validation on rule-based rm
             if self.config.reward_model.enable and test_batch[0].non_tensor_batch["reward_model"]["style"] == "model":
