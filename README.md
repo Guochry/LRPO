@@ -1,6 +1,8 @@
 # LRPO
 
-<img src="figs/overview.jpeg" alt="LRPO overview" width="700">
+<p align="center">
+  <img src="figs/overview.jpeg" alt="LRPO overview" width="700">
+</p>
 
 This is the official implementation for the paper: "Learning to Route Languages for Multilingual Preference Optimization".
 
