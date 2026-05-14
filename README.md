@@ -1,4 +1,4 @@
-# LRPO
+# Learning to Route Languages for Multilingual Preference Optimization
 
 <p align="center">
   <img src="figs/overview.jpeg" alt="LRPO overview" width="700">
