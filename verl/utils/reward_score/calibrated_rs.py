@@ -75,7 +75,7 @@ def lang_match_reward(pred_lang, pred_prob, target_lang, soft=True):
     return float(pred_prob) if soft else 1.0
 
 
-STATS_CSV = "/path/to/unordered_pair_mean_std.csv"
+STATS_CSV = "/path/to/LRPO/examples/data_preprocess/unordered_pair_mean_std.csv"
 
 ALPHA_FIXED = None   # keep None to use adaptive alpha
 K_SHRINK = 0

@@ -28,11 +28,10 @@ pip install -r requirements.txt
 pip install ".[vllm]"
 ```
 
-Reward code may require additional assets, depending on the reward function you use:
+Reward code may require additional assets, depending on the reward function you use. Specify these assets in `verl/utils/reward_score/calibrated_rs.py`:
 
 - a language identification model (e.g., fastText LID);
-- multilingual embedding models (e.g., mmBERT) or reward models;
-- offline calibration statistics for cross-lingual reward normalization.
+- multilingual embedding models (e.g., mmBERT) or reward models.
 
 
 ## Data
