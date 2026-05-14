@@ -15,7 +15,7 @@ LRPO has three main pieces:
 LRPO builds on [`verl`](https://github.com/volcengine/verl), so most distributed training, rollout, checkpointing, and logging behavior follows the upstream `verl` interface.
 
 
-## Installation
+## Quick Start
 
 Create a Python environment with CUDA-compatible PyTorch, then install the package in editable mode:
 
