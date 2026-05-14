@@ -49,40 +49,9 @@ Preprocessing examples are available in `examples/data_preprocess/`. Treat them 
 
 ## Training
 
-The main training entry point is `verl.trainer.main_ppo` with LRPO-specific routing options:
+The main training entry point is `verl.trainer.main_ppo` with LRPO-specific routing options. See `examples/grpo_trainer/run_lrpo.sh` for a concrete launch script. Replace the data paths, checkpoint paths, reward-asset paths, logging paths, and `PYTHONPATH` before using it outside the original environment.
 
-```bash
-python -m verl.trainer.main_ppo \
-  algorithm.adv_estimator=grpo \
-  data.train_files=/path/to/train.parquet \
-  data.val_files=/path/to/test.parquet \
-  data.train_batch_size=2048 \
-  data.max_prompt_length=512 \
-  data.max_response_length=1024 \
-  +data.dynamic_lang_policy=True \
-  +data.lang_policy_alpha=0.1 \
-  +data.lang_policy_update_every=5 \
-  +data.lang_policy_temperature_init=1.0 \
-  +data.lang_policy_temperature_min=0.3 \
-  +data.lang_policy_temperature_decay=0.999 \
-  +data.lang_policy_epsilon_init=0.2 \
-  +data.lang_policy_epsilon_min=0.0 \
-  +data.lang_policy_epsilon_decay=0.995 \
-  +data.lang_policy_orig_lang_min=2 \
-  +data.lang_policy_group_norm=zscore \
-  actor_rollout_ref.model.path=/path/to/base-or-warm-start-model \
-  actor_rollout_ref.rollout.name=vllm \
-  actor_rollout_ref.rollout.n=8 \
-  custom_reward_function.path=/path/to/reward_function.py \
-  custom_reward_function.name=compute_score_batch \
-  reward_model.reward_manager=batch \
-  trainer.n_gpus_per_node=8 \
-  trainer.total_epochs=4
-```
-
-See `examples/grpo_trainer/run_lrpo.sh` for a concrete launch script. Replace the data paths, checkpoint paths, reward-asset paths, logging paths, and `PYTHONPATH` before using it outside the original environment.
-
-The command introduces several LRPO-specific hyperparameters for the language router:
+The training script introduces several LRPO-specific hyperparameters for the language router:
 
 | Option | Meaning |
 | --- | --- |
@@ -108,15 +77,14 @@ In addition to existing multilingual benchmarks, this project introduces **CARE 
 - **cross-cultural information seeking**, where users ask about another region or culture from a foreign-language perspective.
 
 The dataset is publicly available at [geyang627/care_pro](https://huggingface.co/datasets/geyang627/care_pro).
-
-To evaluate on CARE (Pro), generate model responses for each question and compare each response against the gold target with the LLM-as-a-judge prompt in `evaluation/prompt.txt`. The judge assigns one of four labels:
+To evaluate on CARE (Pro), generate model responses for each question and compare each response against the gold reference with the LLM-as-a-judge prompt in `evaluation/prompt.txt`. The judge assigns one of four labels:
 
 - `CORRECT`
 - `CORRECT_BUT_WRONG_LANGUAGE`
 - `INCORRECT`
 - `NOT_ATTEMPTED`
 
-Only `CORRECT` is counted as correct. `CORRECT_BUT_WRONG_LANGUAGE` is separated from factual correctness but treated as incorrect for the final accuracy, so the evaluation measures both answer correctness and adherence to the question language.
+Only `CORRECT` is counted as correct. `CORRECT_BUT_WRONG_LANGUAGE` is separated from factual correctness but treated as incorrect for the final accuracy.
 
 
 ## Citation
