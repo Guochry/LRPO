@@ -7,15 +7,13 @@
 This is the official implementation for the paper: "Learning to Route Languages for Multilingual Preference Optimization".
 LRPO is an online preference optimization method for multilingual LLMs, which treats the rollout language as a selectable training variable. For each question, it samples multilingual rollout groups, scores them with calibrated cross-lingual rewards, and updates both the policy model and a trainable language router.
 
-LRPO builds on [`verl`](https://github.com/volcengine/verl), so most distributed training, rollout, checkpointing, and logging behavior follows the upstream `verl` interface.
-
-## Method Summary
-
 LRPO has three main pieces:
 
 - **Language-routed rollouts:** for each training question, LRPO generates a group of responses in multiple target languages under a fixed rollout budget.
 - **Calibrated multilingual rewards:** generated responses are compared with high-quality references using cross-lingual semantic similarity, then calibrated so scores are more comparable across language pairs.
 - **Trainable language router:** a contextual multi-armed bandit learns topic- and region-conditioned language preferences and balances exploration with exploitation during training.
+
+LRPO builds on [`verl`](https://github.com/volcengine/verl), so most distributed training, rollout, checkpointing, and logging behavior follows the upstream `verl` interface.
 
 
 ## Installation
