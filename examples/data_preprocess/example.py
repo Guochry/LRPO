@@ -12,11 +12,11 @@ from datasets import Dataset, DatasetDict, ClassLabel
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--local_dir", default="/srv/nlprx-lab/share6/gguo37/rl/dynamic_mrpo_router_tuning/examples/data_preprocess/data/care_helpsteer_pku")
+    parser.add_argument("--local_dir", default="/path/to/LRPO/examples/data_preprocess/data/lrpo_data")
 
     args = parser.parse_args()
     
-    with open('/srv/nlprx-lab/share5/gguo37/rl/data_analysis/region/final_dedu_safety.json', 'r', encoding='utf-8') as file:
+    with open('/path/to/LRPO/examples/data_preprocess/data/lrpo_data.json', 'r', encoding='utf-8') as file:
         my_bench = json.load(file)
     full_ds = Dataset.from_list(my_bench)
     full_ds = full_ds.add_column("language_str", full_ds["language"])
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
 
-    data_source = "care_zh"
+    data_source = "lrpo"
 
     def make_map_fn(split):
         def process_fn(example, idx):

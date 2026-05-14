@@ -5,8 +5,8 @@ export PYTHONPATH=/path/to/LRPO:$PYTHONPATH
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files=/path/to/LRPO/data/train.parquet \
-    data.val_files=/path/to/LRPO/data/test.parquet \
+    data.train_files=/path/to/LRPO/data/lrpo_data/train.parquet \
+    data.val_files=/path/to/LRPO/data/lrpo_data/test.parquet \
     data.train_batch_size=2048 \
     data.max_prompt_length=512 \
     data.max_response_length=1024 \

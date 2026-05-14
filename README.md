@@ -36,12 +36,12 @@ Reward code may require additional assets, depending on the reward function you 
 
 ## Data
 
-LRPO uses the `verl` parquet format. Each row should provide the fields needed for prompting, reward computation, and language routing:
+LRPO uses the `verl` parquet format. Each row should provide the fields needed for rollout, reward computation, and language routing:
 
 - `prompt`
-- `reward_model.ground_truth`
-- `ability`: topic/category label used by the language router
-- `extra_info.language`: source or reference language for the example
+- `reward_model.ground_truth`: reference provided
+- `ability`: topic label used by the language router
+- `extra_info.language`: language in which the example is originally written
 - `extra_info.region`: region label for regional examples, if applicable
 
 Preprocessing examples are available in `examples/data_preprocess/`. Treat them as templates and adapt them to your own dataset paths and schema.
@@ -80,7 +80,7 @@ python -m verl.trainer.main_ppo \
   trainer.total_epochs=4
 ```
 
-See `examples/grpo_trainer/run_erm.sh` for a concrete launch script. Replace the data paths, checkpoint paths, reward-asset paths, logging paths, and `PYTHONPATH` before using it outside the original environment.
+See `examples/grpo_trainer/run_lrpo.sh` for a concrete launch script. Replace the data paths, checkpoint paths, reward-asset paths, logging paths, and `PYTHONPATH` before using it outside the original environment.
 
 ## Router Options
 
@@ -99,14 +99,6 @@ See `examples/grpo_trainer/run_erm.sh` for a concrete launch script. Replace the
 | `+data.lang_policy_group_norm` | Reward normalization for router updates, for example `center` or `zscore`. |
 | `+data.lang_policy_log_path` | Optional JSONL path for router probability logs. |
 
-
-## Public Release Checklist
-
-Before public reproduction, the repository still needs:
-
-- add two calibration ways;
-- released reward calibration files;
-- removal or parameterization of private absolute paths.
 
 ## Citation
 
