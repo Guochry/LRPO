@@ -100,6 +100,25 @@ The command introduces several LRPO-specific hyperparameters for the language ro
 | `+data.lang_policy_log_path` | Optional JSONL path for router probability logs. |
 
 
+## Evaluation
+
+In addition to existing multilingual benchmarks, this project introduces **CARE (Pro)**, a cross-lingual and cross-cultural evaluation benchmark for realistic multilingual information needs. CARE (Pro) targets two settings that are often underrepresented in standard benchmarks:
+
+- **fine-grained insider regional knowledge**, where questions require local, city-, town-, or community-level knowledge rather than broad country-level facts;
+- **cross-cultural information seeking**, where users ask about another region or culture from a foreign-language perspective.
+
+The dataset is publicly available at [geyang627/care_pro](https://huggingface.co/datasets/geyang627/care_pro).
+
+To evaluate on CARE (Pro), generate model responses for each question and compare each response against the gold target with the LLM-as-a-judge prompt in `evaluation/prompt.txt`. The judge assigns one of four labels:
+
+- `CORRECT`
+- `CORRECT_BUT_WRONG_LANGUAGE`
+- `INCORRECT`
+- `NOT_ATTEMPTED`
+
+Only `CORRECT` is counted as correct. `CORRECT_BUT_WRONG_LANGUAGE` is separated from factual correctness but treated as incorrect for the final accuracy, so the evaluation measures both answer correctness and adherence to the question language.
+
+
 ## Citation
 
 ```bibtex
