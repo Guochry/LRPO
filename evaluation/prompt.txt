@@ -1,0 +1,80 @@
+Your job is to look at a question, a gold target, and a predicted answer, and then assign a grade of either: ["CORRECT", "CORRECT_BUT_WRONG_LANGUAGE", "INCORRECT", "NOT_ATTEMPTED"].
+First, I will give examples of each grade, and then you will grade a new example.
+
+The following are examples of CORRECT predicted answers.
+Question: 阿曼允许在公共场合饮酒吗？
+Gold target: 在公共场所饮酒或醉酒是法律禁止的行为。
+Predicted answer 1: 不允许
+Predicted answer 2: 在公共场合饮酒属于违法行为。
+
+These predicted answers are all CORRECT because:
+    - They fully contain the important information in the gold target.
+    - They do not contain any information that contradicts the gold target.
+    - Only semantic meaning matters; capitalization, punctuation, grammar, and order don't matter.
+    - Hedging and guessing are permissible, provided the gold target is fully included and the response contains no incorrect information.
+    - The predicted answer is in the **same language as the question**.
+
+
+The following are examples of CORRECT_BUT_WRONG_LANGUAGE predicted answers.
+
+Question: 谁发明了电话？
+Gold target: 亚历山大·格拉汉姆·贝尔
+Predicted answer 1: 알렉산더 그레이엄 벨
+Predicted answer 2: Invented by Alexander Bell.
+
+These predicted answers are CORRECT_BUT_WRONG_LANGUAGE because:
+    - The factual content is **correct** (same entity as the gold target).
+    - But the predicted answer is **not in the same language as the question**.
+    - Minor code-switching for proper nouns is allowed, but the overall answer here is clearly in a different language than the question.
+
+
+The following are examples of INCORRECT predicted answers.
+
+Question: 印度的 8 月 15 日是如何庆祝的？
+Gold target: 这一天，印度各地都会举行升旗仪式、游行和文化活动来庆祝国庆节。
+Predicted answer 1: 这一天主要是家人团聚并交换礼物。
+Predicted answer 2: इस दिन लोग दिवाली की तरह पटाखे जलाते हैं और लक्ष्मी पूजा करते हैं।
+
+Question: What are the names of Barack Obama's children?
+Gold target: Malia and Sasha
+Predicted answer 1: Malia.
+Predicted answer 2: Malia, Sasha, and Susan.
+
+These predicted answers are all INCORRECT because:
+    - A factual statement in the answer contradicts the gold target.
+    - Any incorrect factual content leads to INCORRECT — regardless of the language used.
+    - Incorrect statements with hedging (“it is possible that…”) are still considered incorrect.
+
+
+The following are examples of NOT_ATTEMPTED predicted answers.
+
+Question: 在印度文化中，新郎通常如何抵达婚礼现场？
+Gold target: 新郎骑马，并伴随婚礼队伍一起到达。
+Predicted answer 1: 这取决于家庭传统，我不敢给出确定的回答。
+Predicted answer 2: 抱歉，没有足够信息回答这个问题。
+
+Question: What are the names of Barack Obama's children?
+Gold target: Malia and Sasha
+Predicted answer 1: I don't know.
+Predicted answer 2: Barack Obama has two children. I know that one of them is Malia, but I'm not sure about the other one.
+
+These predicted answers are NOT_ATTEMPTED because:
+    - The important information in the gold target is not included.
+    - No statements in the answer contradict the gold target.
+    - The answer expresses uncertainty without providing the correct entity.
+
+
+Here is a new example. Simply reply with either CORRECT, INCORRECT, NOT ATTEMPTED. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+```
+Question: {question}
+Gold target: {target}
+Predicted answer: {predicted_answer}
+```
+
+Grade the predicted answer of this new question as one of:
+A. CORRECT
+B. CORRECT_BUT_WRONG_LANGUAGE
+C. INCORRECT
+D. NOT_ATTEMPTED
+
+Just return the letters "A", "B", "C", or "D", with no text around it.

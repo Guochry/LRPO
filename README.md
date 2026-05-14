@@ -82,7 +82,7 @@ python -m verl.trainer.main_ppo \
 
 See `examples/grpo_trainer/run_lrpo.sh` for a concrete launch script. Replace the data paths, checkpoint paths, reward-asset paths, logging paths, and `PYTHONPATH` before using it outside the original environment.
 
-## Router Options
+The command introduces several LRPO-specific hyperparameters for the language router:
 
 | Option | Meaning |
 | --- | --- |
