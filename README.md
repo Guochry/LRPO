@@ -30,8 +30,8 @@ pip install ".[vllm]"
 
 Reward code may require additional assets, depending on the reward function you use:
 
-- a language identification model (e.g., https://fasttext.cc/docs/en/language-identification.html);
-- mmBERT or other multilingual embedding models or multilingual reward models;
+- a language identification model (e.g., fastText LID);
+- multilingual embedding models (e.g., mmBERT) or reward models;
 - offline calibration statistics for cross-lingual reward normalization.
 
 
