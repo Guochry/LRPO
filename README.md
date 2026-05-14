@@ -24,13 +24,8 @@ cd LRPO
 pip install -e .
 pip install -r requirements.txt
 
-# Optional rollout backends:
-
-# vLLM backend
+# Optional vLLM rollout backend
 pip install ".[vllm]"
-
-# SGLang backend
-pip install ".[sglang]"
 ```
 
 Reward code may require additional assets, depending on the reward function you use:
