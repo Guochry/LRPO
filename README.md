@@ -23,11 +23,9 @@ Create a Python environment with CUDA-compatible PyTorch, then install the packa
 cd LRPO
 pip install -e .
 pip install -r requirements.txt
-```
 
-Optional rollout backends:
+# Optional rollout backends:
 
-```bash
 # vLLM backend
 pip install ".[vllm]"
 
