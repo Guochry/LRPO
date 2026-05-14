@@ -20,7 +20,7 @@ LRPO builds on [`verl`](https://github.com/volcengine/verl), so most distributed
 Create a Python environment with CUDA-compatible PyTorch, then install the package in editable mode:
 
 ```bash
-cd LRPO
+git clone https://github.com/Guochry/LRPO.git && cd LRPO
 pip install -e .
 pip install -r requirements.txt
 
