@@ -2,9 +2,7 @@
 
 This is the official implementation for the paper: "Learning to Route Languages for Multilingual Preference Optimization".
 
-![LRPO overview](figs/overview.pdf)
-
-[View the overview figure](figs/overview.pdf)
+[View the overview figure](figs/overview.jpeg)
 
 LRPO is an online preference optimization method for multilingual LLMs, which treats the rollout language as a selectable training variable. For each question, it samples multilingual rollout groups, scores them with calibrated cross-lingual rewards, and updates both the policy model and a trainable language router.
 
