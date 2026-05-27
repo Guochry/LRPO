@@ -1,11 +1,11 @@
-# Learning to Route Languages for Multilingual Preference Optimization
+# Learning to Route Languages for Multilingual Policy Optimization
 
 <p align="center">
   <img src="figs/overview.jpeg" alt="LRPO overview" width="700">
 </p>
 
-This is the official implementation for the paper: "Learning to Route Languages for Multilingual Preference Optimization".
-LRPO is an online preference optimization method for multilingual LLMs, which treats the rollout language as a selectable training variable. 
+This is the official implementation for the paper: "Learning to Route Languages for Multilingual Policy Optimization".
+LRPO is an online reinforcement learning method for multilingual LLMs, which treats the rollout language as a selectable training variable. 
 LRPO has three main pieces:
 
 - **Language-routed rollouts:** for each training question, LRPO generates a group of responses in multiple target languages under a fixed rollout budget.
@@ -71,13 +71,13 @@ The training script introduces several LRPO-specific hyperparameters for the lan
 
 ## Evaluation
 
-In addition to existing multilingual benchmarks, this project introduces **CARE (Pro)**, a cross-lingual and cross-cultural evaluation benchmark for realistic multilingual information needs. CARE (Pro) targets two settings that are often underrepresented in standard benchmarks:
+In addition to existing multilingual benchmarks, this project introduces **CARE-pro**, a cross-lingual and cross-cultural evaluation benchmark for realistic multilingual information needs. CARE (Pro) targets two settings that are often underrepresented in standard benchmarks:
 
 - **fine-grained insider regional knowledge**, where questions require local, city-, town-, or community-level knowledge rather than broad country-level facts;
 - **cross-cultural information seeking**, where users ask about another region or culture from a foreign-language perspective.
 
 The dataset is publicly available at [geyang627/care_pro](https://huggingface.co/datasets/geyang627/care_pro).
-To evaluate on CARE (Pro), generate model responses for each question and compare each response against the gold reference with the LLM-as-a-judge prompt in `evaluation/prompt.txt`. The judge assigns one of four labels:
+To evaluate on CARE-pro, generate model responses for each question and compare each response against the gold reference with the LLM-as-a-judge prompt in `evaluation/prompt.txt`. The judge assigns one of four labels:
 
 - `CORRECT`
 - `CORRECT_BUT_WRONG_LANGUAGE`
@@ -91,7 +91,7 @@ Only `CORRECT` is counted as correct. `CORRECT_BUT_WRONG_LANGUAGE` is separated 
 
 ```bibtex
 @misc{lrpo,
-  title = {Learning to Route Languages for Multilingual Preference Optimization},
+  title = {Learning to Route Languages for Multilingual Policy Optimization},
   author = {Geyang Guo and Hiromi Wakaki and Yuki Mitsufuji and Alan Ritter and Wei Xu},
   year = {2026},
   note = {ICML}
